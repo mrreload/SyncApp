@@ -5,6 +5,9 @@
 package syncapp;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -12,9 +15,14 @@ import java.io.*;
  */
 public class SplitMan {
 
-    public static void FileSplitter(String szFile) throws FileNotFoundException, IOException {
+    public static String[] FileSplitter(String szFile, String szOutDir) throws FileNotFoundException, IOException {
+        if (!new File(szOutDir).exists()) {
+            new File(szOutDir).mkdirs();
+        }
         FileInputStream fis = new FileInputStream(szFile);
         String fileName;
+        String szOutFile;
+        ArrayList<String> alFiles = new ArrayList<>();
         int size = 1024 * 1024;
         byte buffer[] = new byte[size];
 
@@ -26,23 +34,55 @@ public class SplitMan {
             }
 
             fileName = String.format("%s.part%09d", szFile, count);
-            System.out.println(new File(fileName).getName());
-            FileOutputStream fos = new FileOutputStream("C:\\tmp" + File.separatorChar + new File(fileName).getName());
+//            System.out.println(new File(fileName).getName());
+            szOutFile = szOutDir + File.separatorChar + new File(fileName).getName();
+            FileOutputStream fos = new FileOutputStream(szOutFile);
             fos.write(buffer, 0, i);
             fos.flush();
             fos.close();
-
+//            System.out.println(szOutFile);
+            alFiles.add(count, szOutFile);
             ++count;
+            
         }
+        String[] szFileList = (String[]) alFiles.toArray(new String[0]);
         System.out.println(count);
+        return szFileList;
     }
 
-    public static void FileJoiner(String szDir) {
-        // get number of files in temp folder
-        System.out.println(new File(szDir).list().length);
-        System.out.println(folderSize(new File(szDir)));
-        System.out.println(new File("D:\\test.zip").length());
+    public static void FileJoiner(File[] szFiles, String szOutFile) {
+        try {
+            // get number of files in temp folder
+    //        System.out.println(new File(szDir).list().length);
+    //        System.out.println(folderSize(new File(szDir)));
+            System.out.println("Joiner started..");
+
+            File ofile = new File(szOutFile);
+            if (ofile.exists()) ofile.delete();
+            FileOutputStream fos;
+            FileInputStream fis;
+            byte[] fileBytes;
+            int bytesRead = 0;
+
+            fos = new FileOutputStream(ofile, true);
+            for (File file : szFiles) {
+                fis = new FileInputStream(file);
+                fileBytes = new byte[(int) file.length()];
+                bytesRead = fis.read(fileBytes, 0, (int) file.length());
+                assert (bytesRead == fileBytes.length);
+                assert (bytesRead == (int) file.length());
+                fos.write(fileBytes);
+                fos.flush();
+                fileBytes = null;
+                fis.close();
+                fis = null;
+            }
+            fos.close();
+            fos = null;
         
+        } catch (IOException ex) {
+            Logger.getLogger(SplitMan.class.getName()).log(Level.SEVERE, null, ex);
+        } 
 
     }
 
@@ -59,12 +99,12 @@ public class SplitMan {
     }
 
     public static File[] getList(String szDir) {
-        
+
         File file = new File(szDir);
         File[] files = file.listFiles();
         String[] szFiles = new String[files.length];
         for (int fileInList = 0; fileInList < files.length; fileInList++) {
-            System.out.println(files[fileInList].toString());
+//            System.out.println(files[fileInList].toString());
             szFiles[fileInList] = files[fileInList].toString();
         }
         return files;

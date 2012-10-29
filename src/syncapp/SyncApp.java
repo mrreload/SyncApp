@@ -19,16 +19,22 @@ public class SyncApp {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        String szFile = "D:\\test.zip";
-        
+        String szFile = "/home/mrreload/amd.run";
+        String szWorkFolder = "/home/mrreload/temp";
+//        try {
 //            SplitMan.FileSplitter(szFile);
-//            SplitMan.FileJoiner("C:\\tmp");
-            System.out.println(SplitMan.getList("/home/mrreload/Downloads"));
-        
-        System.exit(0);
+//            SplitMan.FileJoiner(SplitMan.getList("C:\\tmp"));
+//            System.out.println(SplitMan.getList("C:\\tmp").length);
+//           
+//        } catch (FileNotFoundException ex) {
+//            Logger.getLogger(SyncApp.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (IOException ex) {
+//            Logger.getLogger(SyncApp.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        System.exit(0);
         // Create the object with the run() method
         //Runnable tSend = new Sender();
-        Runnable tRcv = new Receiver();
+        Runnable tRcv = new Server();
 // Create the thread supplying it with the runnable object
         //Thread t1 = new Thread(tSend);
         Thread t2 = new Thread(tRcv);
@@ -36,8 +42,16 @@ public class SyncApp {
         //t1.start();
         t2.start();
         try {
-            Sender.SndFile(szFile);
-            Sender.SndFile("D:\\Dell_WinXPSP3_SATA.iso");
+//            SplitMan.FileSplitter("D:\\Dell_WinXPSP3_SATA.iso", "C:\\tmp");
+//            Sender.SendList("C:\\tmp");
+            Server.iSock = 13267;
+            Sender.SndMSG("REQ,,/home/mrreload/amd.run,,0");
+//            Sender.SndMSG("ACK,,Helo,,you,,We are listening");
+//            Sender.SndMSG("FIL,,/home/mrreload/amd.run,,0");
+//            Sender.SndMSG("LST,,Helo,,File System,,Receiving a list");
+//            Sender.SndMSG("XLST,,Helo,,XBMC,,Receiving a XBMC List");
+//            Sender.SendMain(szFile, szWorkFolder);
+//            SplitMan.FileJoiner(SplitMan.getList("C:\\temp"), "C:\\temp\\testiso.iso");
         } catch (IOException ex) {
             Logger.getLogger(SyncApp.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {

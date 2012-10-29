@@ -100,7 +100,7 @@ public class Server implements Runnable {
         String szFileOutPath = "/home/mrreload/temp";
         String szCurrentChunk;
         String szSHAFull;
-        InputStream in = cSock.getInputStream();
+         in = cSock.getInputStream();
         DataInputStream clientData = new DataInputStream(in);
 
         ArrayList<File> alFiles = new ArrayList<>();
