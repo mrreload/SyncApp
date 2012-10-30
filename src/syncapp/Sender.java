@@ -17,16 +17,16 @@ public class Sender {
 //        }
 //    }
 
-    private static String fullHash;
+    public static String fullHash;
     private static String OrgFileName;
     private static String Title;
     private static String Year;
     public static boolean BadFile;
 
-    public static void SndFile(String szType, String szFile, int iCurrentFile, int iTotalFile) throws IOException, Exception {
+    public static void SndFile(String szHost, String szType, String szFile, int iCurrentFile, int iTotalFile) throws IOException, Exception {
         String sep = ",,";
-        System.out.println("Sending file " + szFile);
-        try (Socket sock = new Socket("localhost", 13267)) {
+        System.out.println("Sending file " + szFile + " to " + szHost);
+        try (Socket sock = new Socket(szHost, 13267)) {
             File myFile = new File(szFile);
             String szSHA = SHACheckSum.getSHA(szFile);
             byte[] mybytearray = new byte[(int) myFile.length()];
@@ -42,7 +42,7 @@ public class Sender {
 
             //Sending file name and file size to the server
             DataOutputStream dos = new DataOutputStream(os);
-            dos.writeUTF(szType + sep + myFile.getName() + sep + Title + sep + szSHA + sep + iCurrentFile + sep + iTotalFile);
+            dos.writeUTF(szType + sep + myFile.getName() + sep + Title + sep + szSHA + sep + iCurrentFile + sep + iTotalFile + sep + fullHash);
 
             dos.writeLong(mybytearray.length);
             dos.write(mybytearray, 0, mybytearray.length);
@@ -50,12 +50,12 @@ public class Sender {
         }
     }
 
-    public static void SendList(String szType,String[] szList) throws IOException, Exception {
+    public static void SendList(String szHost, String szType, String[] szList) throws IOException, Exception {
 //        File file = new File(szDir);
 //        File[] files = file.listFiles();
         for (int i = 0; i < szList.length; i++) {
 //            System.out.println(szList[i]);
-            SndFile(szType, szList[i], i, szList.length);
+            SndFile(szHost, szType, szList[i], i, szList.length);
         }
 
     }
@@ -78,13 +78,13 @@ public class Sender {
         Year = "2012";
         Title = "The Avengers";
 //        Sender.SendList(SplitMan.FileSplitter(szFile, szWorkFolder));
-        SndMSG("Hello this is a message");
-        SndMSG("BADCHUNK,,3");
+        SndMSG("Hello this is a message", "192");
+        SndMSG("BADCHUNK,,3", "F");
     }
 
-    public static void SndMSG(String szMSG) throws IOException, Exception {
+    public static void SndMSG(String szHost, String szMSG) throws IOException, Exception {
         
-        try (Socket sock = new Socket("localhost", 13267)) {
+        try (Socket sock = new Socket(szHost, 13267)) {
             
             OutputStream os = sock.getOutputStream();
 

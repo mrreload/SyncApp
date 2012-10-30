@@ -19,8 +19,15 @@ public class SyncApp {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        String szFile = "/home/mrreload/amd.run";
+        String szRemoteHost;
+        if (args.length >= 1) {
+            szRemoteHost = args[0];
+        } else {
+            szRemoteHost = "localhost";
+        }
+        String szFile = "D:\\test.zip";
         String szWorkFolder = "/home/mrreload/temp";
+        Server.iSock = 13267;
 //        try {
 //            SplitMan.FileSplitter(szFile);
 //            SplitMan.FileJoiner(SplitMan.getList("C:\\tmp"));
@@ -43,9 +50,9 @@ public class SyncApp {
         t2.start();
         try {
 //            SplitMan.FileSplitter("D:\\Dell_WinXPSP3_SATA.iso", "C:\\tmp");
-//            Sender.SendList("C:\\tmp");
-            Server.iSock = 13267;
-            Sender.SndMSG("REQ,,/home/mrreload/amd.run,,0");
+//            Sender.SendList("localhost", "FIL", Sender.getList("C:\\tmp\\filesync"));
+            
+            Sender.SndMSG(szRemoteHost, "REQ,," + szFile + ",,0");
 //            Sender.SndMSG("ACK,,Helo,,you,,We are listening");
 //            Sender.SndMSG("FIL,,/home/mrreload/amd.run,,0");
 //            Sender.SndMSG("LST,,Helo,,File System,,Receiving a list");

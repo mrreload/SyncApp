@@ -79,11 +79,10 @@ public class SplitMan {
             }
             fos.close();
             fos = null;
-        
+        System.out.println("Joiner Ended..");
         } catch (IOException ex) {
             Logger.getLogger(SplitMan.class.getName()).log(Level.SEVERE, null, ex);
-        } 
-
+        }
     }
 
     public static long folderSize(File directory) {
