@@ -27,7 +27,7 @@ static String CHUNK;
             new Thread(new Runnable() {
                 public void run() {
                     try {
-                        Sender.SendList(SplitMan.FileSplitter(FILE, "/home/mrreload/tmp"));
+                        Sender.SendList("FIL", SplitMan.FileSplitter(FILE, "/home/mrreload/tmp"));
                     } catch (IOException ex) {
                         Logger.getLogger(Request.class.getName()).log(Level.SEVERE, null, ex);
                     } catch (Exception ex) {

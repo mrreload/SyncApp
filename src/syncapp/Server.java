@@ -44,6 +44,8 @@ public class Server implements Runnable {
 
             szElements = clientData.readUTF().split(separ);
             if (szElements.length > 0) {
+                //in.close();
+                clientData.close();
                 parseMSG(szElements);
             }
 
@@ -78,7 +80,7 @@ public class Server implements Runnable {
         if (szMSG[0].equals("FIL")) {
             System.out.println("Received a FIL");
             for (int i = 0; i < szMSG.length; i++) {
-//            System.out.println(szMSG[i]);
+            Server.rcvFile2(szMSG);
             }
         }
         if (szMSG[0].equals("LST")) {
@@ -153,13 +155,16 @@ public class Server implements Runnable {
         int bytesRead;
         int current = 0;
         String szFileOutPath = "/home/mrreload/temp";
+        if (!new File(szFileOutPath).exists()) {
+            new File(szFileOutPath).mkdirs();
+        }
         String[] szElements;
 //        ServerSocket serverSocket = null;
 //        serverSocket = new ServerSocket(13267);
 
         while (true) {
-//            cSock = null;
-//            cSock = sSock.accept();
+            cSock = null;
+            cSock = sSock.accept();
 
             in = cSock.getInputStream();
 
@@ -167,23 +172,27 @@ public class Server implements Runnable {
 
             szElements = clientData.readUTF().split(separ);
 
-            String fileName = szElements[0];
-            String szTitle = szElements[1];
-            String szSHA = szElements[2];
-            String szFinalFile = szFileOutPath + fileName;
-            OutputStream output = new FileOutputStream(szFinalFile);
-            long size = clientData.readLong();
-            System.out.println("Receiving: " + fileName + " With Size: " + size + " Title: " + szTitle + " SHA256: " + szSHA);
-            byte[] buffer = new byte[1024];
-            while (size > 0 && (bytesRead = clientData.read(buffer, 0, (int) Math.min(buffer.length, size))) != -1) {
-                output.write(buffer, 0, bytesRead);
-                size -= bytesRead;
-                //System.out.println("received: " + bytesRead);
+            String fileName = szElements[1];
+            String szTitle = szElements[2];
+            String szSHA = szElements[3];
+            int index = Integer.parseInt(szElements[4]);
+            int iCurrentNum = index + 1;
+            int iTotalNum = Integer.parseInt(szElements[5]);
+            String szSHAFull = szElements[6];
+            String szFinalFile = szFileOutPath + File.separatorChar + fileName;
+            try (OutputStream output = new FileOutputStream(szFinalFile)) {
+                long size = clientData.readLong();
+                System.out.println("Receiving: " + szFinalFile + " With Size: " + size + " SHA256: " + szSHA);
+                byte[] buffer = new byte[1024];
+                while (size > 0 && (bytesRead = clientData.read(buffer, 0, (int) Math.min(buffer.length, size))) != -1) {
+                    output.write(buffer, 0, bytesRead);
+                    size -= bytesRead;
+                    //System.out.println("received: " + bytesRead);
+                }
+                System.out.println("Received: " + fileName);
             }
-            System.out.println("Received: " + fileName);
-            // Closing the FileOutputStream handle
-            output.close();
             System.out.println(Server.verifyHash(szSHA, SHACheckSum.getSHA(szFinalFile)));
+            
         }
     
     }

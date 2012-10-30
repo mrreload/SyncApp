@@ -23,7 +23,7 @@ public class Sender {
     private static String Year;
     public static boolean BadFile;
 
-    public static void SndFile(String szFile, int iCurrentFile, int iTotalFile) throws IOException, Exception {
+    public static void SndFile(String szType, String szFile, int iCurrentFile, int iTotalFile) throws IOException, Exception {
         String sep = ",,";
         System.out.println("Sending file " + szFile);
         try (Socket sock = new Socket("localhost", 13267)) {
@@ -42,7 +42,7 @@ public class Sender {
 
             //Sending file name and file size to the server
             DataOutputStream dos = new DataOutputStream(os);
-            dos.writeUTF(myFile.getName() + sep + Title + sep + szSHA + sep + iCurrentFile + sep + iTotalFile + sep + fullHash + sep + OrgFileName + sep + Year);
+            dos.writeUTF(szType + sep + myFile.getName() + sep + Title + sep + szSHA + sep + iCurrentFile + sep + iTotalFile);
 
             dos.writeLong(mybytearray.length);
             dos.write(mybytearray, 0, mybytearray.length);
@@ -50,12 +50,12 @@ public class Sender {
         }
     }
 
-    public static void SendList(String[] szList) throws IOException, Exception {
+    public static void SendList(String szType,String[] szList) throws IOException, Exception {
 //        File file = new File(szDir);
 //        File[] files = file.listFiles();
         for (int i = 0; i < szList.length; i++) {
 //            System.out.println(szList[i]);
-            SndFile(szList[i], i, szList.length);
+            SndFile(szType, szList[i], i, szList.length);
         }
 
     }
@@ -77,7 +77,7 @@ public class Sender {
         OrgFileName = new File(szFile).getName();
         Year = "2012";
         Title = "The Avengers";
-        Sender.SendList(SplitMan.FileSplitter(szFile, szWorkFolder));
+//        Sender.SendList(SplitMan.FileSplitter(szFile, szWorkFolder));
         SndMSG("Hello this is a message");
         SndMSG("BADCHUNK,,3");
     }
