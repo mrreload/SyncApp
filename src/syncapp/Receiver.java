@@ -9,6 +9,7 @@ package syncapp;
  * @author mrreload
  */
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -31,7 +32,7 @@ public class Receiver implements Runnable {
         String separ = ",,";
         int bytesRead;
         int current = 0;
-        String szFileOutPath = "C:\\tmp\\";
+        String szFileOutPath = Config.readProp("server.tmp", "sync.conf");
         String[] szElements;
         ServerSocket serverSocket = null;
         serverSocket = new ServerSocket(13267);
@@ -49,7 +50,7 @@ public class Receiver implements Runnable {
             String fileName = szElements[0];
             String szTitle = szElements[1];
             String szSHA = szElements[2];
-            String szFinalFile = szFileOutPath + fileName;
+            String szFinalFile = szFileOutPath + File.separatorChar + fileName;
             OutputStream output = new FileOutputStream(szFinalFile);
             long size = clientData.readLong();
             System.out.println("Receiving: " + fileName + " With Size: " + size + " Title: " + szTitle + " SHA256: " + szSHA);

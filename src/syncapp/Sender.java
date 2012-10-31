@@ -18,15 +18,16 @@ public class Sender {
 //    }
 
     public static String fullHash;
-    private static String OrgFileName;
+    public static String OrgFileName;
     private static String Title;
     private static String Year;
     public static boolean BadFile;
 
     public static void SndFile(String szHost, String szType, String szFile, int iCurrentFile, int iTotalFile) throws IOException, Exception {
         String sep = ",,";
+        int iPort = Integer.parseInt(Config.readProp("remote.port", "sync.conf"));
         System.out.println("Sending file " + szFile + " to " + szHost);
-        try (Socket sock = new Socket(szHost, 13267)) {
+        try (Socket sock = new Socket(szHost, iPort)) {
             File myFile = new File(szFile);
             String szSHA = SHACheckSum.getSHA(szFile);
             byte[] mybytearray = new byte[(int) myFile.length()];
@@ -42,7 +43,7 @@ public class Sender {
 
             //Sending file name and file size to the server
             DataOutputStream dos = new DataOutputStream(os);
-            dos.writeUTF(szType + sep + myFile.getName() + sep + Title + sep + szSHA + sep + iCurrentFile + sep + iTotalFile + sep + fullHash);
+            dos.writeUTF(szType + sep + myFile.getName() + sep + Title + sep + szSHA + sep + iCurrentFile + sep + iTotalFile + sep + fullHash + sep + OrgFileName);
 
             dos.writeLong(mybytearray.length);
             dos.write(mybytearray, 0, mybytearray.length);
@@ -84,7 +85,9 @@ public class Sender {
 
     public static void SndMSG(String szHost, String szMSG) throws IOException, Exception {
         
-        try (Socket sock = new Socket(szHost, 13267)) {
+        int iPort = Integer.parseInt(Config.readProp("remote.port", "sync.conf"));
+        
+        try (Socket sock = new Socket(Config.readProp("remote.host", "sync.conf"), iPort)) {
             
             OutputStream os = sock.getOutputStream();
 

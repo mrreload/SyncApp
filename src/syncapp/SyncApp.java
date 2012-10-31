@@ -25,7 +25,7 @@ public class SyncApp {
         } else {
             szRemoteHost = "localhost";
         }
-        String szFile = "D:\\test.zip";
+        String szFile = "/home/mrreload/amd.run";
         String szWorkFolder = "/home/mrreload/temp";
         Server.iSock = 13267;
 //        try {
@@ -52,7 +52,7 @@ public class SyncApp {
 //            SplitMan.FileSplitter("D:\\Dell_WinXPSP3_SATA.iso", "C:\\tmp");
 //            Sender.SendList("localhost", "FIL", Sender.getList("C:\\tmp\\filesync"));
             
-            Sender.SndMSG(szRemoteHost, "REQ,," + szFile + ",,0");
+            Sender.SndMSG(Config.readProp("remote.host", "sync.conf"), "REQ,," + szFile + ",,0");
 //            Sender.SndMSG("ACK,,Helo,,you,,We are listening");
 //            Sender.SndMSG("FIL,,/home/mrreload/amd.run,,0");
 //            Sender.SndMSG("LST,,Helo,,File System,,Receiving a list");

@@ -54,7 +54,7 @@ public class SplitMan {
         try {
             // get number of files in temp folder
     //        System.out.println(new File(szDir).list().length);
-    //        System.out.println(folderSize(new File(szDir)));
+            System.out.println("OutPut to: " + szOutFile);
             System.out.println("Joiner started..");
 
             File ofile = new File(szOutFile);

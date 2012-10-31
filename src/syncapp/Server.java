@@ -31,7 +31,8 @@ public class Server implements Runnable {
     static int iCurrentChunk;
     static int iTotalChunk;
     static ArrayList<File> alFiles;
-
+    static String szOrgFileName;
+    
     private static void Listen() throws Exception {
         String separ = ",,";
         String[] szElements;
@@ -49,19 +50,23 @@ public class Server implements Runnable {
                 szElements = null;
 
             }
-            if ((iCurrentChunk == iTotalChunk) && iTotalChunk != 0) {
+            if ((iCurrentChunk == iTotalChunk) && iTotalChunk != 0 && iCurrentChunk > 0) {
                 System.out.println("We can Assemble now");
 
                 try {
                     File[] szFileList = (File[]) alFiles.toArray(new File[0]);
-                    SplitMan.FileJoiner(szFileList, "C:\\temp\\test2.zip");
+                    String szOutFolder = Config.readProp("output.folder", "sync.conf");
+                    if (!new File(szOutFolder).exists()) {
+                        new File(szOutFolder).mkdirs();
+                    }
+                    SplitMan.FileJoiner(szFileList, szOutFolder + File.separatorChar + (new File(Server.szOrgFileName).getName()));
                     System.out.println("Back to Listen");
                 } catch (Exception ex) {
                     Logger.getLogger(Request.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
 
-            System.out.println("Assembler loop is running...");
+            
         }
     }
 
@@ -134,7 +139,8 @@ public class Server implements Runnable {
             iCurrentChunk = index + 1;
             iTotalChunk = Integer.parseInt(szFileInfo[5]);
             String szSHAFull = szFileInfo[6];
-            String szFileOutPath = "C:\\temp" + File.separatorChar + szSHAFull;
+            szOrgFileName = szFileInfo[7];
+            String szFileOutPath = Config.readProp("server.tmp", "sync.conf") + File.separatorChar + szSHAFull;
         if (!new File(szFileOutPath).exists()) {
             new File(szFileOutPath).mkdirs();
         }

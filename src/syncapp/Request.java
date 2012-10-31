@@ -29,7 +29,8 @@ static String szRemoteHost;
                 public void run() {
                     try {
                         Sender.fullHash = SHACheckSum.getSHA(FILE);
-                        Sender.SendList(szRemoteHost, "FIL", SplitMan.FileSplitter(FILE, "C:\\tmp"));
+                        Sender.OrgFileName = FILE;
+                        Sender.SendList(szRemoteHost, "FIL", SplitMan.FileSplitter(FILE, Config.readProp("sender.tmp", "sync.conf")));
                     } catch (IOException ex) {
                         Logger.getLogger(Request.class.getName()).log(Level.SEVERE, null, ex);
                     } catch (Exception ex) {
