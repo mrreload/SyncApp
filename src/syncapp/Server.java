@@ -32,13 +32,18 @@ public class Server implements Runnable {
     static int iTotalChunk;
     static ArrayList<File> alFiles;
     static String szOrgFileName;
+    private static boolean REQinProgress;
+    static String szSHAFull;
     
     private static void Listen() throws Exception {
         String separ = ",,";
         String[] szElements;
+        String szOutFileFinal = null;
         System.out.println("Starting Server: on " + iSock);
         sSock = new ServerSocket(iSock);
         while (true) {
+            iCurrentChunk = 0;
+            iTotalChunk = 0;
             cSock = sSock.accept();
             in = cSock.getInputStream();
             DataInputStream clientData = new DataInputStream(in);
@@ -50,6 +55,7 @@ public class Server implements Runnable {
                 szElements = null;
 
             }
+            
             if ((iCurrentChunk == iTotalChunk) && iTotalChunk != 0 && iCurrentChunk > 0) {
                 System.out.println("We can Assemble now");
 
@@ -59,10 +65,15 @@ public class Server implements Runnable {
                     if (!new File(szOutFolder).exists()) {
                         new File(szOutFolder).mkdirs();
                     }
-                    SplitMan.FileJoiner(szFileList, szOutFolder + File.separatorChar + (new File(Server.szOrgFileName).getName()));
+                    szOutFileFinal = szOutFolder + File.separatorChar + (new File(Server.szOrgFileName).getName());
+                    SplitMan.FileJoiner(szFileList, szOutFileFinal);
                     System.out.println("Back to Listen");
                 } catch (Exception ex) {
                     Logger.getLogger(Request.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (szSHAFull.equals(SHACheckSum.getSHA(szOutFileFinal))) {
+                    Sender.SndMSG("COMPLETE");
+                    REQinProgress = false;
                 }
             }
 
@@ -87,17 +98,52 @@ public class Server implements Runnable {
             for (int i = 0; i < szMSG.length; i++) {
 //            System.out.println(szMSG[i]);
             }
+            if (!REQinProgress) {
+                Sender.SndMSG("READY");
+            } else {
+                Sender.SndMSG("WAIT");
+            }
         }
+        
+        if (szMSG[0].equals("READY")) {
+            System.out.println("READY Message received from Server");
+            Sender.servStatus = true;
+            for (int i = 0; i < szMSG.length; i++) {
+//            System.out.println(szMSG[i]);
+            }
+        }
+        
+        if (szMSG[0].equals("COMPLETE")) {
+            System.out.println("COMPLETE Message received from Client");
+            REQinProgress = false;
+            //REQinProgress = false;
+            for (int i = 0; i < szMSG.length; i++) {
+//            System.out.println(szMSG[i]);
+            }
+        }
+        
+        if (szMSG[0].equals("WAIT")) {
+            System.out.println("Received an WAIT, Remote Server is busy");
+            for (int i = 0; i < szMSG.length; i++) {
+//            System.out.println(szMSG[i]);
+            }
+        }
+        
         if (szMSG[0].equals("REQ")) {
             System.out.println("Received a REQ from: " + cSock.getInetAddress().getHostAddress());
             for (int i = 0; i < szMSG.length; i++) {
 //                System.out.println(szMSG[i]);
             }
-            Request.reqFile(cSock.getInetAddress().getHostAddress(), szMSG);
-
+            if (!REQinProgress) {
+                REQinProgress = true;
+                Request.reqFile(cSock.getInetAddress().getHostAddress(), szMSG);
+            } else {
+                Sender.SndMSG("WAIT,,Server Busy");
+            }
         }
+        
         if (szMSG[0].equals("FIL")) {
-            System.out.println("Received a FIL " + szMSG.length);
+//            System.out.println("Received a FIL " + szMSG.length);
 
             for (int i = 0; i < szMSG.length; i++) {
 //            Server.rcvFile2(szMSG);
@@ -127,7 +173,7 @@ public class Server implements Runnable {
             alFiles = new ArrayList<>();
         }
         while (blReceive) {
-
+Sender.servStatus = false;
             in = cSock.getInputStream();
 
             DataInputStream clientData = new DataInputStream(in);
@@ -138,7 +184,7 @@ public class Server implements Runnable {
             int index = Integer.parseInt(szFileInfo[4]);
             iCurrentChunk = index + 1;
             iTotalChunk = Integer.parseInt(szFileInfo[5]);
-            String szSHAFull = szFileInfo[6];
+            szSHAFull = szFileInfo[6];
             szOrgFileName = szFileInfo[7];
             String szFileOutPath = Config.readProp("server.tmp", "sync.conf") + File.separatorChar + szSHAFull;
         if (!new File(szFileOutPath).exists()) {
@@ -150,22 +196,19 @@ public class Server implements Runnable {
                 System.out.println("Receiving: " + szCurrentChunk + " Size: " + size + " Chunk#: " + iCurrentChunk);
                 byte[] buffer = new byte[1024];
                 while (size > 0 && (bytesRead = clientData.read(buffer, 0, (int) Math.min(buffer.length, size))) != -1) {
-//                    System.out.println("Writing File..");
                     output.write(buffer, 0, bytesRead);
                     size -= bytesRead;
-//                    System.out.println("received: " + bytesRead);
                 }
-                System.out.println("Received: " + fileName + " " + size);
+//                System.out.println("Received: " + fileName + " " + size);
             }
             // Add file to received collection, must check for matching source file
-
             if (Server.verifyHash(szSHA, SHACheckSum.getSHA(szCurrentChunk))) {
-                System.out.println("Chunk is good!");
+                
                 alFiles.add(index, new File(szCurrentChunk));
-
 
             } else {
                 //add logic to re-send corrupt chunk
+                System.out.println("Chunk is BAD!");
             }
             blReceive = false;
         }

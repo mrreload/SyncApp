@@ -22,6 +22,7 @@ public class Sender {
     private static String Title;
     private static String Year;
     public static boolean BadFile;
+    static boolean servStatus;
 
     public static void SndFile(String szHost, String szType, String szFile, int iCurrentFile, int iTotalFile) throws IOException, Exception {
         String sep = ",,";
@@ -79,11 +80,13 @@ public class Sender {
         Year = "2012";
         Title = "The Avengers";
 //        Sender.SendList(SplitMan.FileSplitter(szFile, szWorkFolder));
-        SndMSG("Hello this is a message", "192");
-        SndMSG("BADCHUNK,,3", "F");
+        SndMSG("192");
+        SndMSG("F");
     }
 
-    public static void SndMSG(String szHost, String szMSG) throws IOException, Exception {
+    public static void SndMSG(String szMSG) throws IOException, Exception {
+        
+        
         
         int iPort = Integer.parseInt(Config.readProp("remote.port", "sync.conf"));
         
@@ -104,6 +107,18 @@ public class Sender {
         while (!BadFile) {
             Thread.sleep(5000);
         } 
+        
+    }
+    public static void servReady() throws IOException, Exception {
+        Thread.sleep(5000);
+        while (!servStatus) {
+            Sender.SndMSG("ACK");
+            Thread.sleep(2000);
+        }
+            
+            
+        
+       
         
     }
     

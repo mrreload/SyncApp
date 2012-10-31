@@ -17,6 +17,7 @@ public class Request {
 static String FILE;
 static String CHUNK;
 static String szRemoteHost;
+
     public static void reqFile(String szHost, String[] szFile) throws Exception {
       szRemoteHost = szHost;
             //Format:
@@ -42,4 +43,5 @@ static String szRemoteHost;
             //Server.rcvFile2(szFile);
 //            Sender.SendList(SplitMan.FileSplitter(szFile[1], "/home/mrreload/tmp"));
         } 
+    
 }
