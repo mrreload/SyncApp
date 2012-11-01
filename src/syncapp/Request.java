@@ -39,7 +39,7 @@ static String szRemoteHost;
                     }
                 }
             }).start();
-            System.out.println("loop is running...");
+            System.out.println("Sending Requested Files...");
             //Server.rcvFile2(szFile);
 //            Sender.SendList(SplitMan.FileSplitter(szFile[1], "/home/mrreload/tmp"));
         } 

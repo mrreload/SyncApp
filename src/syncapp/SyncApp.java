@@ -25,23 +25,31 @@ public class SyncApp {
         } else {
             szRemoteHost = "localhost";
         }
-        String szFile = "D:\\test.zip";
-        String szFile2 = "D:\\cb.exe";
+        String szFile = "C:\\test.zip";
+        String szFile2 = "C:\\cb.exe";
+        String szFile3 = "C:\\test.pdf";
+        String szFile4 = "C:\\Cisco.zip";
         String szWorkFolder = "/home/mrreload/temp";
         Server.iSock = 13267;
 
         Runnable tRcv = new Server();
 // Create the Server thread supplying it with the runnable object
-       
+
         Thread t2 = new Thread(tRcv);
 // Start the thread
-        
+
         t2.start();
         try {
-Sender.servReady();
+            
+            Sender.servReady();
             Sender.SndMSG("REQ,," + szFile + ",,0");
             Sender.servReady();
             Sender.SndMSG("REQ,," + szFile2 + ",,0");
+//            
+            Sender.servReady();
+            Sender.SndMSG("REQ,," + szFile3 + ",,0");
+            Sender.servReady();
+            Sender.SndMSG("REQ,," + szFile4 + ",,0");
 //            Sender.SndMSG("ACK,,Helo,,you,,We are listening");
 //            Sender.SndMSG("FIL,,/home/mrreload/amd.run,,0");
 //            Sender.SndMSG("LST,,Helo,,File System,,Receiving a list");
@@ -53,6 +61,6 @@ Sender.servReady();
         } catch (Exception ex) {
             Logger.getLogger(SyncApp.class.getName()).log(Level.SEVERE, null, ex);
         }
-            
+
     }
 }

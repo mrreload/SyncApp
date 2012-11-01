@@ -28,11 +28,12 @@ public class SplitMan {
 
         int count = 0;
         while (true) {
+            
             int i = fis.read(buffer, 0, size);
             if (i == -1) {
                 break;
             }
-
+Sender.senderBusy = true;
             fileName = String.format("%s.part%09d", szFile, count);
 //            System.out.println(new File(fileName).getName());
             szOutFile = szOutDir + File.separatorChar + new File(fileName).getName();
@@ -47,6 +48,7 @@ public class SplitMan {
         }
         String[] szFileList = (String[]) alFiles.toArray(new String[0]);
         System.out.println(count);
+        Sender.senderBusy = false;
         return szFileList;
     }
 

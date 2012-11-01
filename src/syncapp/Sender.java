@@ -6,6 +6,7 @@ package syncapp;
  */
 import java.io.*;
 import java.net.Socket;
+import java.util.concurrent.TimeUnit;
 
 public class Sender {
 //    public static String szFile;
@@ -23,8 +24,9 @@ public class Sender {
     private static String Year;
     public static boolean BadFile;
     static boolean servStatus;
+    static boolean senderBusy;
 
-    public static void SndFile(String szHost, String szType, String szFile, int iCurrentFile, int iTotalFile) throws IOException, Exception {
+    public static void SndFile(String szHost, String szType, String szFile, int iCurrentFile, int iTotalFile) {
         String sep = ",,";
         int iPort = Integer.parseInt(Config.readProp("remote.port", "sync.conf"));
         System.out.println("Sending file " + szFile + " to " + szHost);
@@ -49,6 +51,9 @@ public class Sender {
             dos.writeLong(mybytearray.length);
             dos.write(mybytearray, 0, mybytearray.length);
             dos.flush();
+            dos.close();
+        } catch (IOException ioe) {
+           System.out.println(ioe.getLocalizedMessage() + " to " + Config.readProp("remote.host", "sync.conf") + ":" + iPort); 
         }
     }
 
@@ -56,9 +61,11 @@ public class Sender {
 //        File file = new File(szDir);
 //        File[] files = file.listFiles();
         for (int i = 0; i < szList.length; i++) {
+            senderBusy = true;
 //            System.out.println(szList[i]);
             SndFile(szHost, szType, szList[i], i, szList.length);
         }
+        senderBusy = false;
 
     }
 
@@ -84,42 +91,41 @@ public class Sender {
         SndMSG("F");
     }
 
-    public static void SndMSG(String szMSG) throws IOException, Exception {
-        
-        
+    public static void SndMSG(String szMSG) {
         
         int iPort = Integer.parseInt(Config.readProp("remote.port", "sync.conf"));
-        
+
         try (Socket sock = new Socket(Config.readProp("remote.host", "sync.conf"), iPort)) {
-            
+
             OutputStream os = sock.getOutputStream();
 
             //Sending file name and file size to the server
             DataOutputStream dos = new DataOutputStream(os);
             dos.writeUTF(szMSG);
-            
+
             dos.flush();
             dos.close();
-        }
+        }  catch (IOException ioe) {
+            System.out.println(ioe.getLocalizedMessage() + " to " + Config.readProp("remote.host", "sync.conf") + ":" + iPort);
+//            System.out.println(ioe.getMessage());
+        } 
     }
-    public static void reSender(String szFile, int iCurrentFile, int iTotalFile) throws InterruptedException{
+
+    public static void reSender(String szFile, int iCurrentFile, int iTotalFile) throws InterruptedException {
         BadFile = false;
         while (!BadFile) {
-            Thread.sleep(5000);
-        } 
-        
+            TimeUnit.SECONDS.sleep(5);
+        }
+
     }
+
     public static void servReady() throws IOException, Exception {
-        Thread.sleep(5000);
+        TimeUnit.SECONDS.sleep(5);
+        
         while (!servStatus) {
             Sender.SndMSG("ACK");
-            Thread.sleep(2000);
+            TimeUnit.SECONDS.sleep(3);
         }
-            
-            
-        
-       
-        
+
     }
-    
 }
