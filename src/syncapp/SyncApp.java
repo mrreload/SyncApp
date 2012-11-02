@@ -4,8 +4,9 @@
  */
 package syncapp;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,15 +41,24 @@ public class SyncApp {
 
         t2.start();
         try {
+            TimeUnit.SECONDS.sleep(new Random().nextInt(5) + 1);
+            Sender.servReady();
             
-            Sender.servReady();
             Sender.SndMSG("REQ,," + szFile + ",,0");
+            
+            TimeUnit.SECONDS.sleep(new Random().nextInt(5) + 1);
             Sender.servReady();
+            
             Sender.SndMSG("REQ,," + szFile2 + ",,0");
 //            
+            TimeUnit.SECONDS.sleep(new Random().nextInt(5) + 1);
             Sender.servReady();
+            
             Sender.SndMSG("REQ,," + szFile3 + ",,0");
+            
+            TimeUnit.SECONDS.sleep(new Random().nextInt(5) + 1);
             Sender.servReady();
+            
             Sender.SndMSG("REQ,," + szFile4 + ",,0");
 //            Sender.SndMSG("ACK,,Helo,,you,,We are listening");
 //            Sender.SndMSG("FIL,,/home/mrreload/amd.run,,0");

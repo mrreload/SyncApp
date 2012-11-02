@@ -23,8 +23,9 @@ public class Sender {
     private static String Title;
     private static String Year;
     public static boolean BadFile;
-    static boolean servStatus;
+    static boolean RemoteCanReceive;
     static boolean senderBusy;
+    
 
     public static void SndFile(String szHost, String szType, String szFile, int iCurrentFile, int iTotalFile) {
         String sep = ",,";
@@ -46,7 +47,7 @@ public class Sender {
 
             //Sending file name and file size to the server
             DataOutputStream dos = new DataOutputStream(os);
-            dos.writeUTF(szType + sep + myFile.getName() + sep + Title + sep + szSHA + sep + iCurrentFile + sep + iTotalFile + sep + fullHash + sep + OrgFileName);
+            dos.writeUTF(szType + sep + myFile.getName() + sep + szSHA + sep + iCurrentFile + sep + iTotalFile + sep + fullHash + sep + OrgFileName);
 
             dos.writeLong(mybytearray.length);
             dos.write(mybytearray, 0, mybytearray.length);
@@ -122,7 +123,7 @@ public class Sender {
     public static void servReady() throws IOException, Exception {
         TimeUnit.SECONDS.sleep(5);
         
-        while (!servStatus) {
+        while (!RemoteCanReceive) {
             Sender.SndMSG("ACK");
             TimeUnit.SECONDS.sleep(3);
         }
